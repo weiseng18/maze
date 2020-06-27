@@ -1,2 +1,2 @@
 # maze
-maze generation
+maze generation practice
