@@ -1,2 +1,2 @@
 # maze
-maze generation
+maze generation and git practice
