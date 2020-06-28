@@ -21,6 +21,25 @@ function Maze(height, width) {
 	return maze;
 }
 
+// returns a list of adjacent walls
+Maze.prototype.getAdjacentWalls = function(x, y) {
+	var walls = [];
+	if (!this.outOfBounds(x-1, y)) //if cell above exists, can add horizontal wall above
+		walls.push({x:x-1, y:y, dir:"h"});
+	if (!this.outOfBounds(x+1, y)) //if cell below exists, can add horizontal wall below
+		walls.push({x:x, y:y, dir:"h"});
+	if (!this.outOfBounds(x, y-1)) //if cell to the left exists, can add vertical wall to the left
+		walls.push({x:x, y:y-1, dir:"v"});
+	if (!this.outOfBounds(x, y+1)) //if cell to the right exists, can add vertical wall to the right
+		walls.push({x:x, y:y, dir:"v"});
+	return walls;
+}
+
+// check if a cell is out of bounds
+Maze.prototype.outOfBounds = function(x, y) {
+	return (x >= 0 && x < height && y >= 0 && y < height);
+}
+
 function Display(maze) {
 	// generates HTML table for displaying the grid
 	// tentative method chosen to display is having a <td> for each space on the grid, and a <td> for each wall
