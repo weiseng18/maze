@@ -9,6 +9,11 @@ function init2D(height, width, val) {
 	return arr;
 }
 
+function randomIndex(length) {
+	// Math.random() range is [0,1)s
+	return Math.floor(Math.random()*length);
+}
+
 function get(id) {
 	return document.getElementById(id);
 }
