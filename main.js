@@ -4,19 +4,55 @@ function Maze(height, width) {
 	this.width = width;
 
 	// visited array
-	this.grid = init2D(height, width, 0);
+	this.grid = init2D(height, width, false);
 
 	// 1 to indicate that a wall exists
 	// verticalWall[x][y] is the state of the vertical wall between grid[x][y] and grid[x][y+1]
-	this.verticalWalls = init2D(height-1, width, true); 
+	this.verticalWalls = init2D(height, width-1, true); 
 	// horizontalWall[x][y] is the state of the horizontal wall between grid[x][y] and grid[x+1][y]
-	this.horizontalWalls = init2D(height, width-1, true); 
+	this.horizontalWalls = init2D(height-1, width, true); 
 
-	/*
-	placeholder for removing walls as it Maze() essentially returns a grid now
+	// can be initialized as random start cell, but choosing (0, 0) for now
 	var startCell = {x:0, y:0};
 	var wallList = [{x:0, y:0, dir:"v"}, {x:0, y:0, dir:"h"}];
-	*/
+	this.grid[0][0] = true;
+	var ufds = new UFDS(height*width);
+
+	while (wallList.length) {
+		
+		var index = randomIndex(wallList.length);
+		var wall = {x:wallList[index].x, y:wallList[index].y, dir:wallList[index].dir};
+		var cell1 = {x:wall.x, y:wall.y};
+		var cell2 = wall.dir=="h" ? {x:wall.x+1, y:wall.y} : {x:wall.x, y:wall.y+1};
+
+		// generate ufds ID x*width + y
+		cell1.ID = cell1.x * width + cell1.y;
+		cell2.ID = cell2.x * width + cell2.y;
+
+		// remove current wall and add new visited cell's walls
+		// only if they are not same set (i.e. not connected by any path)
+		if (!ufds.isSameSet(cell1.ID, cell2.ID)) {
+
+			if (wall.dir == "h") this.horizontalWalls[wall.x][wall.y] = false;
+			else this.verticalWalls[wall.x][wall.y] = false;
+			ufds.unionSet(cell1.ID, cell2.ID);
+
+			// find newly visited cell and add those walls to wallList[]
+			var walls;
+			if (this.grid[cell1.x][cell1.y] == false) {
+				this.grid[cell1.x][cell1.y] = true;
+				walls = this.getAdjacentWalls(cell1.x, cell1.y);
+			}
+			else {
+				this.grid[cell2.x][cell2.y] = true;
+				walls = this.getAdjacentWalls(cell2.x, cell2.y);
+			}
+			wallList = wallList.concat(walls);
+		}
+
+		// remove wall from array
+		wallList.splice(index, 1);
+	}
 }
 
 // returns a list of adjacent walls
@@ -35,7 +71,7 @@ Maze.prototype.getAdjacentWalls = function(x, y) {
 
 // check if a cell is out of bounds
 Maze.prototype.outOfBounds = function(x, y) {
-	return (x >= 0 && x < height && y >= 0 && y < height);
+	return !(x >= 0 && x < this.height && y >= 0 && y < this.width);
 }
 
 function Display(maze) {
@@ -70,17 +106,17 @@ function Display(maze) {
 				cell.style.backgroundColor = "black";
 			}
 		// build vertical walls
-		for (var i=0; i<maze.height-1; i++)
-			for (var j=0; j<maze.width; j++)
+		for (var i=0; i<maze.height; i++)
+			for (var j=0; j<maze.width-1; j++)
 				if (maze.verticalWalls[i][j]) {
-					var cell = get("display").children[0].children[(i<<1) + 1].children[(j<<1)];
+					var cell = get("display").children[0].children[(i<<1)].children[(j<<1) + 1];
 					cell.style.backgroundColor = "black";
 				}
 		// build horizontal walls
-		for (var i=0; i<maze.height; i++)
-			for (var j=0; j<maze.width-1; j++) 
+		for (var i=0; i<maze.height-1; i++)
+			for (var j=0; j<maze.width; j++) 
 				if (maze.horizontalWalls[i][j]) {
-					var cell = get("display").children[0].children[(i<<1)].children[(j<<1)+1];
+					var cell = get("display").children[0].children[(i<<1) + 1].children[(j<<1)];
 					cell.style.backgroundColor = "black";
 				}
 	}
@@ -89,6 +125,7 @@ function Display(maze) {
 window.onload = function() {
 
 	var maze = new Maze(10, 20);
+	console.log(maze);
 
 	var display = new Display(maze);
 	display.generateHTML();
