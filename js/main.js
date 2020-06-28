@@ -141,7 +141,7 @@ function Display(maze) {
 
 window.onload = function() {
 
-	var maze = new Maze(10, 20);
+	var maze = new Maze(20, 40);
 
 	var display = new Display(maze);
 	display.generateHTML();

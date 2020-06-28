@@ -1,9 +1,9 @@
 #mazeArea {
 	border: solid black 2px;
 	position: absolute;
-	top: 15%;
-	left: 10%;
-	height: 70%;
-	width: 80%;
+	top: 10%;
+	left: 5%;
+	height: 80%;
+	width: 90%;
 	padding: 10px;
 }
