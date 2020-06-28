@@ -6,6 +6,9 @@ function Maze(height, width) {
 	// visited array
 	this.grid = init2D(height, width, false);
 
+	// goal
+	this.goal = {x:height-1, y:width-1};
+
 	// 1 to indicate that a wall exists
 	// verticalWall[x][y] is the state of the vertical wall between grid[x][y] and grid[x][y+1]
 	this.verticalWalls = init2D(height, width-1, true); 
@@ -120,6 +123,20 @@ function Display(maze) {
 					cell.style.backgroundColor = "black";
 				}
 	}
+
+	this.loadImages = function() {
+		var goal = maze.goal;
+		console.log(goal);
+		var cell = get("display").children[0].children[(goal.x << 1)].children[(goal.y << 1)];
+
+		var img = new Image();
+		img.src = "img/endflag.png";
+		img.style.display = "block";
+		img.style.marginLeft = "auto";
+		img.style.marginRight = "auto";
+
+		cell.appendChild(img);
+	}
 }
 
 window.onload = function() {
@@ -129,5 +146,6 @@ window.onload = function() {
 	var display = new Display(maze);
 	display.generateHTML();
 	display.buildWalls();
+	display.loadImages();
 
 }
