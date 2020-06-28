@@ -19,7 +19,7 @@ function Maze(height, width) {
 	var ufds = new UFDS(height*width);
 
 	while (wallList.length) {
-		
+
 		var index = randomIndex(wallList.length);
 		var wall = {x:wallList[index].x, y:wallList[index].y, dir:wallList[index].dir};
 		var cell1 = {x:wall.x, y:wall.y};
@@ -125,7 +125,6 @@ function Display(maze) {
 window.onload = function() {
 
 	var maze = new Maze(10, 20);
-	console.log(maze);
 
 	var display = new Display(maze);
 	display.generateHTML();
