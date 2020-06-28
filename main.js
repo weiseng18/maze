@@ -1,24 +1,22 @@
 function Maze(height, width) {
+	// dimensions
+	this.height = height;
+	this.width = width;
+
 	// visited array
-	var grid = init2D(height, width, 0);
+	this.grid = init2D(height, width, 0);
 
 	// 1 to indicate that a wall exists
 	// verticalWall[x][y] is the state of the vertical wall between grid[x][y] and grid[x][y+1]
-	var verticalWalls = init2D(height-1, width, true); 
+	this.verticalWalls = init2D(height-1, width, true); 
 	// horizontalWall[x][y] is the state of the horizontal wall between grid[x][y] and grid[x+1][y]
-	var horizontalWalls = init2D(height, width-1, true); 
+	this.horizontalWalls = init2D(height, width-1, true); 
 
+	/*
+	placeholder for removing walls as it Maze() essentially returns a grid now
 	var startCell = {x:0, y:0};
 	var wallList = [{x:0, y:0, dir:"v"}, {x:0, y:0, dir:"h"}];
-
-	var maze = {};
-	maze.height = height;
-	maze.width = width;
-	maze.grid = grid;
-	maze.verticalWalls = verticalWalls;
-	maze.horizontalWalls = horizontalWalls;
-
-	return maze;
+	*/
 }
 
 // returns a list of adjacent walls
