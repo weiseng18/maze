@@ -89,6 +89,9 @@ function Display(maze) {
 		table.style.borderSpacing = 0;
 		table.style.border = "solid black 2px";
 
+		table.style.marginLeft = "auto";
+		table.style.marginRight = "auto";
+
 		for (var i=0; i<2*maze.height-1; i++) {
 			var row = table.insertRow();
 			row.style.height = (i%2==0 ? "20px" : "2px");
