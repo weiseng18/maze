@@ -142,6 +142,13 @@ function Display(maze) {
 function Player(x, y) {
 	this.x = x;
 	this.y = y;
+
+	this.HTMLsprite = new Image();
+	this.HTMLsprite.id = "player";
+	this.HTMLsprite.src = "img/player.png";
+	this.HTMLsprite.style.display = "block";
+	this.HTMLsprite.style.marginLeft = "auto";
+	this.HTMLsprite.style.marginRight = "auto";
 }
 
 Player.prototype.move = function(which) {
@@ -149,6 +156,9 @@ Player.prototype.move = function(which) {
 	deltas = [{x:-1, y:0}, {x:0, y:-1}, {x:1, y:0}, {x:0, y:1}];
 	wallDeltas = [{x:-1, y:0}, {x:0, y:-1}, {x:0, y:0}, {x:0, y:0}];
 	
+	var prev = {x:this.x, y:this.y}, next;
+	var moved = false;
+
 	switch (which) {
 		case 'w':
 			if (!maze.outOfBounds(this.x + deltas[0].x, this.y + deltas[0].y) && 
@@ -156,6 +166,7 @@ Player.prototype.move = function(which) {
 				this.x += deltas[0].x;
 				this.y += deltas[0].y;
 				console.log("moved up");
+				moved = true;
 			}
 			break;
 		case 'a':
@@ -164,6 +175,7 @@ Player.prototype.move = function(which) {
 				this.x += deltas[1].x;
 				this.y += deltas[1].y;
 				console.log("moved left");
+				moved = true;
 			}
 			break;
 		case 's':
@@ -172,6 +184,7 @@ Player.prototype.move = function(which) {
 				this.x += deltas[2].x;
 				this.y += deltas[2].y;
 				console.log("moved down");
+				moved = true;
 			}
 			break;
 		case 'd':
@@ -180,10 +193,28 @@ Player.prototype.move = function(which) {
 				this.x += deltas[3].x;
 				this.y += deltas[3].y;
 				console.log("moved right");
+				moved = true;
 			}
 			break;
 	}
+
+	// if a successful move was made, update player sprite location
+	if (moved) {
+		next = {x:this.x, y:this.y};
+		this.draw(prev, next);
+	}
 }
+
+Player.prototype.draw = function(prev, next) {
+	// step 1: delete existing player sprite (if it exists)
+	if (prev != next) {
+		var element = get("player");
+		element.parentNode.removeChild(element);
+	}
+	// step 2: re-insert the player
+	var cell = getCell("display", 2*next.x, 2*next.y);
+	cell.appendChild(this.HTMLsprite);
+};
 
 function checkKeypress(e) {
 	if (e.key == 'w' || e.key == 'a' || e.key == 's' || e.key == 'd')
@@ -203,6 +234,9 @@ window.onload = function() {
 	display.generateHTML();
 	display.buildWalls();
 	display.loadEndImage();
+
+	var start = {x:0, y:0};
+	player.draw(start, start);
 
 	window.addEventListener("keypress", checkKeypress);
 
