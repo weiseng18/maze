@@ -105,21 +105,21 @@ function Display(maze) {
 		// connecting the walls at corners
 		for (var i=0; i<maze.height-1; i++)
 			for (var j=0; j<maze.width-1; j++) {
-				var cell = get("display").children[0].children[(i<<1) + 1].children[(j<<1) + 1];
+				var cell = getCell("display", (i<<1)+1, (j<<1)+1);
 				cell.style.backgroundColor = "black";
 			}
 		// build vertical walls
 		for (var i=0; i<maze.height; i++)
 			for (var j=0; j<maze.width-1; j++)
 				if (maze.verticalWalls[i][j]) {
-					var cell = get("display").children[0].children[(i<<1)].children[(j<<1) + 1];
+					var cell = getCell("display", (i<<1), (j<<1)+1);
 					cell.style.backgroundColor = "black";
 				}
 		// build horizontal walls
 		for (var i=0; i<maze.height-1; i++)
 			for (var j=0; j<maze.width; j++) 
 				if (maze.horizontalWalls[i][j]) {
-					var cell = get("display").children[0].children[(i<<1) + 1].children[(j<<1)];
+					var cell = getCell("display", (i<<1)+1, (j<<1));
 					cell.style.backgroundColor = "black";
 				}
 	}
@@ -127,7 +127,8 @@ function Display(maze) {
 	this.loadEndImage = function() {
 		var goal = maze.goal;
 		console.log(goal);
-		var cell = get("display").children[0].children[(goal.x << 1)].children[(goal.y << 1)];
+		
+		var cell = getCell("display", (goal.x<<1), (goal.y<<1));
 
 		var img = new Image();
 		img.src = "img/endflag.png";
