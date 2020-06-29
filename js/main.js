@@ -205,7 +205,30 @@ Player.prototype.move = function(which) {
 	// if a successful move was made, update player sprite location
 	if (moved) {
 		next = {x:this.x, y:this.y};
+		console.log(next, maze.goal);
+		
+		// reach goal
+		var end = false;
+		if (next.x == maze.goal.x && next.y == maze.goal.y) {
+			end = true;
+
+			// remove check keypress so that player cannot move
+			window.removeEventListener("keypress", checkKeypress);
+
+			// remove end flag
+			// tentative method is just to clear the innerHTML
+			getCell("display", 2*maze.goal.x, 2*maze.goal.y).innerHTML = "";
+
+		}
 		this.draw(prev, next);
+
+		// this has to be after drawing the player sprite so that the player sprite updates first
+		// the other half has to be before drawing the player sprite, 
+		// because the method of removing the end flag is to wipe the innerHTML
+		if (end) {
+			// tentative congratulatory message
+			alert("Complete!");
+		}
 	}
 }
 
@@ -226,6 +249,7 @@ function checkKeypress(e) {
 }
 
 var player, maze, display;
+var keypress;
 
 window.onload = function() {
 
