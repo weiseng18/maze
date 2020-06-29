@@ -178,7 +178,6 @@ Player.prototype.move = function(which) {
 				!maze.horizontalWalls[this.x + wallDeltas[0].x][this.y + wallDeltas[0].y]) {
 				this.x += deltas[0].x;
 				this.y += deltas[0].y;
-				console.log("moved up");
 				moved = true;
 			}
 			break;
@@ -187,7 +186,6 @@ Player.prototype.move = function(which) {
 				!maze.verticalWalls[this.x + wallDeltas[1].x][this.y + wallDeltas[1].y]) {
 				this.x += deltas[1].x;
 				this.y += deltas[1].y;
-				console.log("moved left");
 				moved = true;
 			}
 			break;
@@ -196,7 +194,6 @@ Player.prototype.move = function(which) {
 				!maze.horizontalWalls[this.x + wallDeltas[2].x][this.y + wallDeltas[2].y]) {
 				this.x += deltas[2].x;
 				this.y += deltas[2].y;
-				console.log("moved down");
 				moved = true;
 			}
 			break;
@@ -205,7 +202,6 @@ Player.prototype.move = function(which) {
 				!maze.verticalWalls[this.x + wallDeltas[3].x][this.y + wallDeltas[3].y]) {
 				this.x += deltas[3].x;
 				this.y += deltas[3].y;
-				console.log("moved right");
 				moved = true;
 			}
 			break;
@@ -253,6 +249,102 @@ Player.prototype.draw = function(prev, next) {
 }
 
 // ------
+// Path Highlighting
+// ------
+
+// currently using DFS and having a variable to terminate other DFS calls in the stack
+// not very efficient but the maze is small from the POV of a computer
+
+function PathHighlight(maze) {
+	this.start = maze.start;
+	this.goal = {x:maze.goal.x, y:maze.goal.y};
+	this.visited = init2D(maze.height, maze.width, false);
+	
+	this.deltas = [{x:-1, y:0}, {x:0, y:-1}, {x:1, y:0}, {x:0, y:1}];
+	this.wallDeltas = [{x:-1, y:0}, {x:0, y:-1}, {x:0, y:0}, {x:0, y:0}];
+
+	this.pathFound = false;
+	this.parents = init2D(maze.height, maze.width, 0);
+}
+
+PathHighlight.prototype.DFS = function(x, y) {
+	if (this.visited[x][y]) return;
+
+	//console.log("DFS", x, y);
+	this.visited[x][y] = true;
+
+	if (this.goal.x == x && this.goal.y == y) {
+		console.log("path found");
+		this.pathFound = true;
+	}
+
+
+	// try all four directions, code taken from Player.move
+
+	var cur = {x:x, y:y};
+
+	if (!maze.outOfBounds(x + this.deltas[0].x, y + this.deltas[0].y) && 
+		!maze.horizontalWalls[x + this.wallDeltas[0].x][y + this.wallDeltas[0].y]) {
+		var newX = x+this.deltas[0].x,
+			newY = y+this.deltas[0].y;
+		this.DFS(newX, newY);
+		this.parents[newX][newY] = cur;
+	}
+	if (!maze.outOfBounds(x + this.deltas[1].x, y + this.deltas[1].y) && 
+		!maze.verticalWalls[x + this.wallDeltas[1].x][y + this.wallDeltas[1].y]) {
+		var newX = x+this.deltas[1].x,
+			newY = y+this.deltas[1].y;
+		this.DFS(newX, newY);
+		this.parents[newX][newY] = cur;
+	}
+	if (!maze.outOfBounds(x + this.deltas[2].x, y + this.deltas[2].y) && 
+		!maze.horizontalWalls[x + this.wallDeltas[2].x][y + this.wallDeltas[2].y]) {
+		var newX = x+this.deltas[2].x,
+			newY = y+this.deltas[2].y;
+		this.DFS(newX, newY);
+		this.parents[newX][newY] = cur;
+	}
+	if (!maze.outOfBounds(x + this.deltas[3].x, y + this.deltas[3].y) && 
+		!maze.verticalWalls[x + this.wallDeltas[3].x][y + this.wallDeltas[3].y]) {
+		var newX = x+this.deltas[3].x,
+			newY = y+this.deltas[3].y;
+		this.DFS(newX, newY);
+		this.parents[newX][newY] = cur;
+	}
+}
+
+// recursive function that highlights based on parent in DFS
+// first call child should be null
+PathHighlight.prototype.highlight = function(node, child) {
+	// highlight cell
+	var cell = getCell("display", 2*node.x, 2*node.y);
+	cell.style.backgroundColor = "green";
+	// check if wall is to be highlighted
+	if (child != null) {
+		// diff stores how to get from child to parent, so to get the walls it is reversed of the deltas.
+		// currently hardcoded so could do something about going from wall -> HTML table and HTML table -> wall
+		var diff = {x:child.x-node.x, y:child.y-node.y};
+
+		var wallCell;
+		if (comparePoints(diff, this.deltas[0]))
+			wallCell = getCell("display", 2*node.x-1, 2*node.y);
+		else if (comparePoints(diff, this.deltas[1]))
+			wallCell = getCell("display", 2*node.x, 2*node.y-1);
+		else if (comparePoints(diff, this.deltas[2]))
+			wallCell = getCell("display", 2*node.x+1, 2*node.y);
+		else if (comparePoints(diff, this.deltas[3]))
+			wallCell = getCell("display", 2*node.x, 2*node.y+1);
+
+		wallCell.style.backgroundColor = "green";
+	}
+
+	if (!(node.x == this.start.x && node.y == this.start.y)) {
+		var parent = this.parents[node.x][node.y];
+		this.highlight(parent, node);
+	}
+}
+
+// ------
 // Keypress check
 // ------
 
@@ -276,9 +368,15 @@ window.onload = function() {
 	display.buildWalls();
 	display.loadEndImage();
 
-	var start = {x:0, y:0};
-	player.draw(start, start);
+	// display player after loading environment mazey
+	player.draw(maze.start, maze.start);
 
+	// start keypress listener
 	window.addEventListener("keypress", checkKeypress);
 
+	// path highlight
+	pathing = new PathHighlight(maze);
+	// pathing.start == maze.start but purpose is to separate dependencies
+	pathing.DFS(pathing.start.x, pathing.start.y);
+	pathing.highlight(pathing.goal, null);
 };
