@@ -248,8 +248,8 @@ function checkKeypress(e) {
 		player.move(e.key);
 }
 
+// global variables
 var player, maze, display;
-var keypress;
 
 window.onload = function() {
 
