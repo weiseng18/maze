@@ -14,6 +14,13 @@ function randomIndex(length) {
 	return Math.floor(Math.random()*length);
 }
 
+// compares two points a and b
+// there can be other attributes in the objects a and b and it does not matter
+// this is to compare coordinates
+function comparePoints(a, b) {
+	return (a.x == b.x) && (a.y == b.y);
+}
+
 // returns the HTML element of the xth tr of the yth td of a table.
 // expects id to be the id of a table.
 function getCell(id, x, y) {
