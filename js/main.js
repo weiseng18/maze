@@ -139,13 +139,71 @@ function Display(maze) {
 	}
 }
 
+function Player(x, y) {
+	this.x = x;
+	this.y = y;
+}
+
+Player.prototype.move = function(which) {
+	// up, left, down, right
+	deltas = [{x:-1, y:0}, {x:0, y:-1}, {x:1, y:0}, {x:0, y:1}];
+	wallDeltas = [{x:-1, y:0}, {x:0, y:-1}, {x:0, y:0}, {x:0, y:0}];
+	
+	switch (which) {
+		case 'w':
+			if (!maze.outOfBounds(this.x + deltas[0].x, this.y + deltas[0].y) && 
+				!maze.horizontalWalls[this.x + wallDeltas[0].x][this.y + wallDeltas[0].y]) {
+				this.x += deltas[0].x;
+				this.y += deltas[0].y;
+				console.log("moved up");
+			}
+			break;
+		case 'a':
+			if (!maze.outOfBounds(this.x + deltas[1].x, this.y + deltas[1].y) && 
+				!maze.verticalWalls[this.x + wallDeltas[1].x][this.y + wallDeltas[1].y]) {
+				this.x += deltas[1].x;
+				this.y += deltas[1].y;
+				console.log("moved left");
+			}
+			break;
+		case 's':
+			if (!maze.outOfBounds(this.x + deltas[2].x, this.y + deltas[2].y) && 
+				!maze.horizontalWalls[this.x + wallDeltas[2].x][this.y + wallDeltas[2].y]) {
+				this.x += deltas[2].x;
+				this.y += deltas[2].y;
+				console.log("moved down");
+			}
+			break;
+		case 'd':
+			if (!maze.outOfBounds(this.x + deltas[3].x, this.y + deltas[3].y) && 
+				!maze.verticalWalls[this.x + wallDeltas[3].x][this.y + wallDeltas[3].y]) {
+				this.x += deltas[3].x;
+				this.y += deltas[3].y;
+				console.log("moved right");
+			}
+			break;
+	}
+}
+
+function checkKeypress(e) {
+	if (e.key == 'w' || e.key == 'a' || e.key == 's' || e.key == 'd')
+		player.move(e.key);
+}
+
+var player, maze, display;
+
 window.onload = function() {
 
-	var maze = new Maze(20, 40);
+	// starting coords (0, 0);
+	player = new Player(0, 0);
 
-	var display = new Display(maze);
+	maze = new Maze(20, 40);
+
+	display = new Display(maze);
 	display.generateHTML();
 	display.buildWalls();
 	display.loadEndImage();
 
-}
+	window.addEventListener("keypress", checkKeypress);
+
+};
