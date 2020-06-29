@@ -1,3 +1,6 @@
+// ------
+// Maze
+// ------
 function Maze(height, width) {
 	// dimensions
 	this.height = height;
@@ -16,7 +19,7 @@ function Maze(height, width) {
 	this.horizontalWalls = init2D(height-1, width, true); 
 
 	// can be initialized as random start cell, but choosing (0, 0) for now
-	var startCell = {x:0, y:0};
+	this.start = {x:0, y:0};
 	var wallList = [{x:0, y:0, dir:"v"}, {x:0, y:0, dir:"h"}];
 	this.grid[0][0] = true;
 	var ufds = new UFDS(height*width);
@@ -77,6 +80,9 @@ Maze.prototype.outOfBounds = function(x, y) {
 	return !(x >= 0 && x < this.height && y >= 0 && y < this.width);
 }
 
+// ------
+// Display
+// ------
 function Display(maze) {
 	// generates HTML table for displaying the grid
 	// tentative method chosen to display is having a <td> for each space on the grid, and a <td> for each wall
@@ -143,6 +149,9 @@ function Display(maze) {
 	}
 }
 
+// ------
+// Player
+// ------
 function Player(x, y) {
 	this.x = x;
 	this.y = y;
@@ -241,7 +250,11 @@ Player.prototype.draw = function(prev, next) {
 	// step 2: re-insert the player
 	var cell = getCell("display", 2*next.x, 2*next.y);
 	cell.appendChild(this.HTMLsprite);
-};
+}
+
+// ------
+// Keypress check
+// ------
 
 function checkKeypress(e) {
 	if (e.key == 'w' || e.key == 'a' || e.key == 's' || e.key == 'd')
@@ -253,10 +266,10 @@ var player, maze, display;
 
 window.onload = function() {
 
-	// starting coords (0, 0);
-	player = new Player(0, 0);
-
 	maze = new Maze(20, 40);
+
+	// starting coords defined in maze
+	player = new Player(maze.start.x, maze.start.y);
 
 	display = new Display(maze);
 	display.generateHTML();
