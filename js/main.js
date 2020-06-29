@@ -124,7 +124,7 @@ function Display(maze) {
 				}
 	}
 
-	this.loadImages = function() {
+	this.loadEndImage = function() {
 		var goal = maze.goal;
 		console.log(goal);
 		var cell = get("display").children[0].children[(goal.x << 1)].children[(goal.y << 1)];
@@ -146,6 +146,6 @@ window.onload = function() {
 	var display = new Display(maze);
 	display.generateHTML();
 	display.buildWalls();
-	display.loadImages();
+	display.loadEndImage();
 
 }
