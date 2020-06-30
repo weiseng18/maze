@@ -265,6 +265,9 @@ function PathHighlight(maze) {
 
 	this.pathFound = false;
 	this.parents = init2D(maze.height, maze.width, 0);
+
+	// state of highlight in the HTML
+	this.isHighlighted = false;
 }
 
 PathHighlight.prototype.DFS = function(x, y) {
@@ -313,12 +316,26 @@ PathHighlight.prototype.DFS = function(x, y) {
 	}
 }
 
+// wrapper function, node is the end element
+PathHighlight.prototype.highlight = function() {
+	console.log("highlight wrapper");
+	if (this.isHighlighted) {
+		this.highlightRecurse(pathing.goal, null, "white");
+		this.isHighlighted = false;
+	}
+	else {
+		this.highlightRecurse(pathing.goal, null, "green");
+		this.isHighlighted = true;
+	}
+}
+
 // recursive function that highlights based on parent in DFS
 // first call child should be null
-PathHighlight.prototype.highlight = function(node, child) {
+PathHighlight.prototype.highlightRecurse = function(node, child, color) {
+	console.log("highlight recurse", color);
 	// highlight cell
 	var cell = getCell("display", 2*node.x, 2*node.y);
-	cell.style.backgroundColor = "green";
+	cell.style.backgroundColor = color;
 	// check if wall is to be highlighted
 	if (child != null) {
 		// diff stores how to get from child to parent, so to get the walls it is reversed of the deltas.
@@ -335,12 +352,12 @@ PathHighlight.prototype.highlight = function(node, child) {
 		else if (comparePoints(diff, this.deltas[3]))
 			wallCell = getCell("display", 2*node.x, 2*node.y+1);
 
-		wallCell.style.backgroundColor = "green";
+		wallCell.style.backgroundColor = color;
 	}
 
 	if (!(node.x == this.start.x && node.y == this.start.y)) {
 		var parent = this.parents[node.x][node.y];
-		this.highlight(parent, node);
+		this.highlightRecurse(parent, node, color);
 	}
 }
 
@@ -353,7 +370,10 @@ function checkKeypress(e) {
 		player.move(e.key);
 }
 
+// ------
 // global variables
+// ------
+
 var player, maze, display;
 
 window.onload = function() {
@@ -368,7 +388,7 @@ window.onload = function() {
 	display.buildWalls();
 	display.loadEndImage();
 
-	// display player after loading environment mazey
+	// display player after loading environment maze
 	player.draw(maze.start, maze.start);
 
 	// start keypress listener
@@ -378,5 +398,7 @@ window.onload = function() {
 	pathing = new PathHighlight(maze);
 	// pathing.start == maze.start but purpose is to separate dependencies
 	pathing.DFS(pathing.start.x, pathing.start.y);
-	pathing.highlight(pathing.goal, null);
+
+	// event listener on slider (css tricks used so I don't think there is a simpler way to get the state of the HTML element)
+	get("switch").children[1].addEventListener("click", function(){pathing.highlight();});
 };
